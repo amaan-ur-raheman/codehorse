@@ -42,3 +42,4 @@ next-env.d.ts
 
 # warp
 WARP.md
+/lib/generated/prisma
