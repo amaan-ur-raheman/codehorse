@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+*.lcov
 
 # next.js
 /.next/
@@ -19,19 +20,26 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+lerna-debug.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # vercel
 .vercel
@@ -40,6 +48,109 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# prisma
+/lib/generated/
+/prisma/generated/
+
+# database
+*.db
+*.sqlite
+*.sqlite3
+
+# logs
+logs
+*.log
+
+# runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# coverage directory used by tools like istanbul
+lib-cov
+
+# nyc test coverage
+.nyc_output
+
+# grunt intermediate storage
+.grunt
+
+# bower dependency directory
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# compiled binary addons
+build/Release
+
+# dependency directories
+jspm_packages/
+
+# optional npm cache directory
+.npm
+
+# optional eslint cache
+.eslintcache
+
+# optional REPL history
+.node_repl_history
+
+# output of 'npm pack'
+*.tgz
+
+# yarn integrity file
+.yarn-integrity
+
+# parcel-bundler cache
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# serverless directories
+.serverless
+
+# fusebox cache
+.fusebox/
+
+# dynamodb local files
+.dynamodb/
+
+# ternjs port file
+.tern-port
+
+# stores vscode versions used for testing vscode extensions
+.vscode-test
+
+# temporary folders
+tmp/
+temp/
+
 # warp
 WARP.md
-/lib/generated/prisma
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
