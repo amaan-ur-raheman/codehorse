@@ -35,7 +35,7 @@ export async function fetchUserContribution(token: string, username: string) {
 	const query = `
         query($username: String!) {
             user(login: $username) {
-                contributionCollection {
+                contributionsCollection {
                     contributionCalendar {
                         totalContributions
                         weeks {
@@ -77,7 +77,7 @@ export async function fetchUserContribution(token: string, username: string) {
 			throw new Error(`GitHub user '${username}' not found`);
 		}
 
-		return response.user.contributionCollection.contributionCalendar;
+		return response.user.contributionsCollection.contributionCalendar;
 	} catch (error) {
 		console.error("Error fetching contribution data:", error);
 		throw new Error(
