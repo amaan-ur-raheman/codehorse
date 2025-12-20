@@ -40,7 +40,7 @@ const ContributionGraph = () => {
 			<div className="text-sm text-muted-foreground">
 				<span className="font-semibold text-foreground">
 					{data.totalContributions}
-				</span>
+				</span>{" "}
 				contributions in last year
 			</div>
 

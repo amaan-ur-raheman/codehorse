@@ -130,6 +130,7 @@ jspm_packages/
 
 # stores vscode versions used for testing vscode extensions
 .vscode-test
+.vscode
 
 # temporary folders
 tmp/
