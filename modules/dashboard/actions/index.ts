@@ -1,6 +1,7 @@
 "use server";
 
 import {
+	createWebhook,
 	fetchUserContribution,
 	getGithubAccessToken,
 } from "@/modules/github/lib/github";
@@ -223,4 +224,41 @@ export async function getContributionStats() {
 		console.error("Error fetching contribution stats:", error);
 		return null;
 	}
+}
+
+export async function connectRepository(
+	owner: string,
+	repo: string,
+	githubId: number
+) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
+
+	if (!session) {
+		throw new Error("Unauthorized");
+	}
+
+	// TODO: Check if user can connect more repo
+
+	const webhook = await createWebhook(owner, repo);
+
+	if (webhook) {
+		await prisma.repository.create({
+			data: {
+				githubId: BigInt(githubId),
+				name: repo,
+				owner,
+				fullName: `${owner}/${repo}`,
+				url: `https://github.com/${owner}/${repo}`,
+				userId: session.user.id,
+			},
+		});
+	}
+
+	// TODO: Increase repository count for usage tracking
+
+	// TODO: Trigger repository indexing for RAG
+
+	return webhook;
 }
