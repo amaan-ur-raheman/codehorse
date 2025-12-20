@@ -15,6 +15,7 @@ import { useState, useEffect, useRef } from "react";
 
 import { useRepositories } from "@/modules/repository/hooks/use-repositories";
 import { RepositoryListSkeleton } from "@/modules/repository/components/repository-skeleton";
+import { useConnectRepository } from "@/modules/repository/hooks/use-connect-repository";
 
 interface Repository {
 	id: number;
@@ -37,6 +38,8 @@ const RepositoryPage = () => {
 		hasNextPage,
 		isFetchingNextPage,
 	} = useRepositories();
+
+	const { mutate: connectRepo } = useConnectRepository();
 
 	const [localConnectingId, setLocalConnectingId] = useState<number | null>(
 		null
@@ -80,7 +83,19 @@ const RepositoryPage = () => {
 			repo.full_name.toLowerCase().includes(searchQuery.toLowerCase())
 	);
 
-	const handleConnect = (repo: any) => {};
+	const handleConnect = (repo: Repository) => {
+		setLocalConnectingId(repo.id);
+		connectRepo(
+			{
+				owner: repo.full_name.split("/")[0],
+				repo: repo.name,
+				githubId: repo.id,
+			},
+			{
+				onSettled: () => setLocalConnectingId(null),
+			}
+		);
+	};
 
 	if (isLoading) {
 		return (
