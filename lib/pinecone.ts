@@ -9,4 +9,4 @@ export const pinecone = new Pinecone({
 	apiKey,
 });
 
-export const pineconeIndex = pinecone.Index("codehorse-vector-embedding-v1");
+export const pineconeIndex = pinecone.Index("codehorse-vector-embeddings-v2");

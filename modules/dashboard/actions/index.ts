@@ -10,6 +10,7 @@ import prisma from "@/lib/db";
 
 import { Octokit } from "octokit";
 import { headers } from "next/headers";
+import { inngest } from "@/inngest/client";
 
 export async function getDashboardStats() {
 	try {
@@ -258,7 +259,18 @@ export async function connectRepository(
 
 	// TODO: Increase repository count for usage tracking
 
-	// TODO: Trigger repository indexing for RAG
+	try {
+		await inngest.send({
+			name: "repository.connected",
+			data: {
+				owner,
+				repo,
+				userId: session.user.id,
+			},
+		});
+	} catch (error) {
+		console.error("Failed to trigger repository indexing:", error);
+	}
 
 	return webhook;
 }
