@@ -142,6 +142,7 @@ export async function disconnectRepository(repositoryId: string) {
 
 		revalidatePath("/dashboard/settings", "page");
 		revalidatePath("/dashboard/repository", "page");
+		revalidatePath("/dashboard/reviews", "page");
 
 		return { success: true };
 	} catch (error) {
@@ -180,6 +181,7 @@ export async function disconnectAllRepositories() {
 
 		revalidatePath("/dashboard/settings", "page");
 		revalidatePath("/dashboard/repository", "page");
+		revalidatePath("/dashboard/reviews", "page");
 
 		return { success: true, count: result.count };
 	} catch (error) {
