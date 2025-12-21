@@ -1,3 +1,5 @@
+import { reviewPullRequest } from "@/modules/ai/actions";
+
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -9,6 +11,29 @@ export async function POST(request: NextRequest) {
 
 		if (event === "ping") {
 			return NextResponse.json({ message: "Pong" }, { status: 200 });
+		}
+
+		if (event === "pull_request") {
+			const action = body.action;
+			const repo = body.repository.full_name;
+			const prNumber = body.number;
+
+			const [owner, repoName] = repo.split("/");
+
+			if (action === "opened" || action === "synchronize") {
+				reviewPullRequest(owner, repoName, prNumber)
+					.then(() =>
+						console.log(
+							`Successfully processed pull request ${prNumber} for ${repo}`
+						)
+					)
+					.catch((error: any) =>
+						console.error(
+							`Failed to process pull request ${prNumber} for ${repo}:`,
+							error
+						)
+					);
+			}
 		}
 
 		return NextResponse.json(

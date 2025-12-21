@@ -12,7 +12,7 @@ model User {
 	id            String    @id
 	name          String
 	email         String
-	emailVerified Boolean   @default(false)
+	emailVerified  Boolean   @default(false)
 	image         String?
 	createdAt     DateTime  @default(now())
 	updatedAt     DateTime  @updatedAt
@@ -25,20 +25,39 @@ model User {
 }
 
 model Repository {
-	id String @id @default(cuid())
-	githubId BigInt @unique
-	name String
-	owner String
-	fullName String
-	url String
-	userId String
-	user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+	id        String  @id @default(cuid())
+	githubId  BigInt  @unique
+	name      String
+	owner     String
+	fullName  String
+	url       String
+	userId    String
+	user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
 
+	reviews Review[]
+
 	@@index([userId])
 	@@map("repository")
+}
+
+model Review {
+	id 			 String     @id @default(cuid())
+	repositoryId String
+	repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+	prNumber     Int
+	prTitle      String
+	prUrl        String
+	review       String     @db.Text
+	status       String     @default("completed")
+
+	createdAt    DateTime   @default(now())
+	updatedAt    DateTime   @updatedAt
+
+	@@index([repositoryId])
+	@@map("review")
 }
 
 model Session {
