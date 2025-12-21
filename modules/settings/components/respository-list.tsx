@@ -55,6 +55,9 @@ export function RepositoryList() {
 				queryClient.invalidateQueries({
 					queryKey: ["dashboard-stats"],
 				});
+				queryClient.invalidateQueries({
+					queryKey: ["reviews"],
+				});
 				toast.success("Repository disconnected successfully");
 			} else {
 				toast.error(result?.error || "Failed to disconnect repository");
@@ -77,6 +80,9 @@ export function RepositoryList() {
 				});
 				queryClient.invalidateQueries({
 					queryKey: ["dashboard-stats"],
+				});
+				queryClient.invalidateQueries({
+					queryKey: ["reviews"],
 				});
 				toast.success(
 					`Disconnected ${
