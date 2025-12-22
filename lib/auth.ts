@@ -31,6 +31,10 @@ export const auth = betterAuth({
 			scope: ["repo"],
 		},
 	},
+	trustedOrigins: [
+		"http://localhost:3000",
+		"https://kamden-epeiric-caiden.ngrok-free.dev",
+	],
 	plugins: [
 		polar({
 			client: polarClient,
@@ -40,10 +44,12 @@ export const auth = betterAuth({
 					products: [
 						{
 							productId: "087676b3-70c9-4135-943c-5892a93a92b8",
-							slug: "CodeHorse", // Custom slug for easy reference in Checkout URL, e.g. /checkout/CodeHorse
+							slug: "pro", // Custom slug for easy reference in Checkout URL, e.g. /checkout/pro
 						},
 					],
-					successUrl: process.env.POLAR_SUCCESS_URL,
+					successUrl:
+						process.env.POLAR_SUCCESS_URL ||
+						"/dashboard/subscriptions?success=true",
 					authenticatedUsersOnly: true,
 				}),
 				portal({

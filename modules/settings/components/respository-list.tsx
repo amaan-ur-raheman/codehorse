@@ -58,6 +58,9 @@ export function RepositoryList() {
 				queryClient.invalidateQueries({
 					queryKey: ["reviews"],
 				});
+				queryClient.invalidateQueries({
+					queryKey: ["subscription-data"],
+				});
 				toast.success("Repository disconnected successfully");
 			} else {
 				toast.error(result?.error || "Failed to disconnect repository");
@@ -83,6 +86,9 @@ export function RepositoryList() {
 				});
 				queryClient.invalidateQueries({
 					queryKey: ["reviews"],
+				});
+				queryClient.invalidateQueries({
+					queryKey: ["subscription-data"],
 				});
 				toast.success(
 					`Disconnected ${
