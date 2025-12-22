@@ -9,16 +9,19 @@ datasource db {
 }
 
 model User {
-	id            String    @id
-	name          String
-	email         String
-	emailVerified  Boolean   @default(false)
-	image         String?
-	createdAt     DateTime  @default(now())
-	updatedAt     DateTime  @updatedAt
-	sessions      Session[]
-	accounts      Account[]
-	repositories  Repository[]
+	id                 String    @id
+	name               String
+	email              String
+	emailVerified       Boolean   @default(false)
+	image              String?
+	createdAt          DateTime  @default(now())
+	updatedAt          DateTime  @updatedAt
+	sessions           Session[]
+	accounts           Account[]
+	repositories       Repository[]
+	usage 		  	   UserUsage?
+	subscriptionTier   String    @default("free")
+	subscriptionStatus String?
 
 	@@unique([email])
 	@@map("user")
@@ -51,13 +54,26 @@ model Review {
 	prTitle      String
 	prUrl        String
 	review       String     @db.Text
-	status       String     @default("completed")
+	status       String     @default("pending")
 
 	createdAt    DateTime   @default(now())
 	updatedAt    DateTime   @updatedAt
 
 	@@index([repositoryId])
 	@@map("review")
+}
+
+model UserUsage {
+	id        		String @id @default(cuid())
+	userId    		String @unique
+	user      		User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+	repositoryCount Int    @default(0)
+	reviewCounts    Json   @default("{}")
+
+	createdAt       DateTime @default(now())
+	updatedAt       DateTime @updatedAt
+
+	@@map("user_usage")
 }
 
 model Session {
