@@ -1,4 +1,6 @@
 "use client";
+// Note: Metadata export not available for client components
+// Consider moving to layout.tsx or creating a Server Component wrapper
 
 import { ProfileForm } from "@/modules/settings/components/profile-form";
 import { RepositoryList } from "@/modules/settings/components/respository-list";
