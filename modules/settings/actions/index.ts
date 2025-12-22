@@ -6,6 +6,7 @@ import prisma from "@/lib/db";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { deleteWebhook } from "@/modules/github/lib/github";
+import { decrementRepositoryCount } from "@/modules/payment/lib/subscription";
 
 export async function getUserProfile() {
 	try {
@@ -140,6 +141,8 @@ export async function disconnectRepository(repositoryId: string) {
 			},
 		});
 
+		await decrementRepositoryCount(session.user.id);
+
 		revalidatePath("/dashboard/settings", "page");
 		revalidatePath("/dashboard/repository", "page");
 		revalidatePath("/dashboard/reviews", "page");
@@ -161,23 +164,30 @@ export async function disconnectAllRepositories() {
 			throw new Error("Unauthorized");
 		}
 
-		const repositories = await prisma.repository.findMany({
-			where: {
-				userId: session.user.id,
-			},
-		});
+	const repositories = await prisma.repository.findMany({
+		where: {
+			userId: session.user.id,
+		},
+	});
 
-		await Promise.all(
-			repositories.map(async (repo) => {
-				await deleteWebhook(repo.owner, repo.name);
-			})
-		);
+	// Delete webhooks in parallel
+	await Promise.all(
+		repositories.map(async (repo) => {
+			await deleteWebhook(repo.owner, repo.name);
+		})
+	);
 
-		const result = await prisma.repository.deleteMany({
-			where: {
-				userId: session.user.id,
-			},
-		});
+	// Delete all repositories from database
+	const result = await prisma.repository.deleteMany({
+		where: {
+			userId: session.user.id,
+		},
+	});
+
+	// Decrement count by the number of repositories deleted
+	for (let i = 0; i < result.count; i++) {
+		await decrementRepositoryCount(session.user.id);
+	}
 
 		revalidatePath("/dashboard/settings", "page");
 		revalidatePath("/dashboard/repository", "page");
