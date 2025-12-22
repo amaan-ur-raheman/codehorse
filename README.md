@@ -1,5 +1,7 @@
 # Code Horse 🐴
 
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://codehorse.vercel.app)
+
 ![Code Horse Poster](./public/codehorse-poster.png)
 
 **Code Horse** is an intelligent, AI-powered code review assistant designed to streamline your development workflow. By connecting directly with your GitHub repositories, Code Horse automatically analyzes pull requests, providing instant, context-aware feedback to help maintain code quality and catch issues early.
@@ -63,7 +65,7 @@ Manage your plan and usage limits.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/code-horse.git
+    git clone https://github.com/amaan-ur-raheman/codehorse.git
     cd code-horse
     ```
 
