@@ -65,7 +65,15 @@ ${diff}
 
 Please provide:
 1. **Walkthrough**: A file-by-file explanation of the changes.
-2. **Sequence Diagram**: A Mermaid JS sequence diagram visualizing the flow of the changes (if applicable). Use \`\`\`mermaid ... \`\`\` block. **IMPORTANT**: Ensure the Mermaid syntax is valid. Do not use special characters (like quotes, braces, parentheses) inside Note text or labels as it breaks rendering. Keep the diagram simple.
+2. **Sequence Diagram**: A Mermaid JS sequence diagram visualizing the flow of the changes (if applicable). Use \`\`\`mermaid ... \`\`\` block. 
+   **STRICT MERMAID RULES**:
+   - Start with \`sequenceDiagram\`.
+   - **MUST** explicitly declare all participants at the top using \`participant Alias as Name\`.
+   - **DO NOT** use special characters like parentheses \`()\`, slashes \`/\`, dots \`.\`, brackets \`[]\`, or braces \`{}\` in participant names or message labels. Use only alphanumeric characters and spaces.
+   - Example of a GOOD label: \`Process Payment Request\`
+   - Example of a BAD label: \`processPayment(data)\`
+   - Keep the diagram focused on the core logic changes.
+   - If a diagram is not helpful for these changes, omit this section entirely.
 3. **Summary**: Brief overview.
 4. **Strengths**: What's done well.
 5. **Issues**: Bugs, security concerns, code smells.
@@ -107,6 +115,6 @@ Format your response in markdown.`;
 				});
 			}
 		});
-		return { success: true };  
+		return { success: true };
 	}
 );

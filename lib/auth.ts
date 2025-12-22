@@ -33,6 +33,7 @@ export const auth = betterAuth({
 	},
 	trustedOrigins: [
 		"http://localhost:3000",
+		"https://codehorse.vercel.app",
 		"https://kamden-epeiric-caiden.ngrok-free.dev",
 	],
 	plugins: [
