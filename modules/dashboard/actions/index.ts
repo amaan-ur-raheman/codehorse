@@ -7,6 +7,10 @@ import {
 } from "@/modules/github/lib/github";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
+import {
+	canConnectRepository,
+	incrementRepositoryCount,
+} from "@/modules/payment/lib/subscription";
 
 import { Octokit } from "octokit";
 import { headers } from "next/headers";
@@ -240,7 +244,13 @@ export async function connectRepository(
 		throw new Error("Unauthorized");
 	}
 
-	// TODO: Check if user can connect more repo
+	const canConnect = await canConnectRepository(session.user.id);
+
+	if (!canConnect) {
+		throw new Error(
+			"Repository limit reached. Please upgrade to PRO for unlimited repositories."
+		);
+	}
 
 	const webhook = await createWebhook(owner, repo);
 
@@ -255,21 +265,21 @@ export async function connectRepository(
 				userId: session.user.id,
 			},
 		});
-	}
 
-	// TODO: Increase repository count for usage tracking
+		await incrementRepositoryCount(session.user.id);
 
-	try {
-		await inngest.send({
-			name: "repository.connected",
-			data: {
-				owner,
-				repo,
-				userId: session.user.id,
-			},
-		});
-	} catch (error) {
-		console.error("Failed to trigger repository indexing:", error);
+		try {
+			await inngest.send({
+				name: "repository.connected",
+				data: {
+					owner,
+					repo,
+					userId: session.user.id,
+				},
+			});
+		} catch (error) {
+			console.error("Failed to trigger repository indexing:", error);
+		}
 	}
 
 	return webhook;
