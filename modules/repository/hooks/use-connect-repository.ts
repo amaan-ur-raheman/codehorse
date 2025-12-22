@@ -26,6 +26,7 @@ export const useConnectRepository = () => {
 			queryClient.invalidateQueries({
 				queryKey: ["connected-repositories"],
 			});
+			queryClient.invalidateQueries({ queryKey: ["subscription-data"] });
 		},
 		onError: (error: any) => {
 			console.error("Failed to connect repository:", error);
