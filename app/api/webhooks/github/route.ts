@@ -21,13 +21,13 @@ export async function POST(request: NextRequest) {
 			const [owner, repoName] = repo.split("/");
 
 			if (action === "opened" || action === "synchronize") {
-				reviewPullRequest(owner, repoName, prNumber)
+				await reviewPullRequest(owner, repoName, prNumber)
 					.then(() =>
 						console.log(
 							`Successfully processed pull request ${prNumber} for ${repo}`
 						)
 					)
-					.catch((error: any) =>
+					.catch((error: unknown) =>
 						console.error(
 							`Failed to process pull request ${prNumber} for ${repo}:`,
 							error
