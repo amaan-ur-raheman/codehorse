@@ -32,30 +32,28 @@ export async function getDashboardStats() {
 		// Get users github username
 		const { data: user } = await octokit.rest.users.getAuthenticated();
 
-		const totalRepos = await prisma.repository.count({
-			where: {
-				userId: session.user.id,
-			},
-		});
-
-		const calender = await fetchUserContribution(token, user.login);
-		const totalCommits = calender?.totalContributions || 0;
-
-		// Count prs from database or github
-		const { data: prs } = await octokit.rest.search.issuesAndPullRequests({
-			q: `author:${user.login} type:pr`,
-			per_page: 1,
-		});
-
-		const totalPrs = prs.total_count || 0;
-
-		const totalReviews = await prisma.review.count({
-			where: {
-				repository: {
+		const [totalRepos, calender, prs, totalReviews] = await Promise.all([
+			prisma.repository.count({
+				where: {
 					userId: session.user.id,
 				},
-			},
-		});
+			}),
+			fetchUserContribution(token, user.login),
+			octokit.rest.search.issuesAndPullRequests({
+				q: `author:${user.login} type:pr`,
+				per_page: 1,
+			}),
+			prisma.review.count({
+				where: {
+					repository: {
+						userId: session.user.id,
+					},
+				},
+			}),
+		]);
+
+		const totalCommits = calender?.totalContributions || 0;
+		const totalPrs = prs.data.total_count || 0;
 
 		return {
 			totalCommits,
@@ -145,32 +143,33 @@ export async function getMonthlyActivity() {
 		const sixMonthsAgo = new Date();
 		sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-		const reviews = await prisma.review.findMany({
-			where: {
-				repository: {
-					userId: session.user.id,
+		const [reviews, { data: prs }] = await Promise.all([
+			prisma.review.findMany({
+				where: {
+					repository: {
+						userId: session.user.id,
+					},
+					createdAt: {
+						gte: sixMonthsAgo,
+					},
 				},
-				createdAt: {
-					gte: sixMonthsAgo,
+				select: {
+					createdAt: true,
 				},
-			},
-			select: {
-				createdAt: true,
-			},
-		});
+			}),
+			octokit.rest.search.issuesAndPullRequests({
+				q: `author:${user.login} type:pr created:>${
+					sixMonthsAgo.toISOString().split("T")[0]
+				}`,
+				per_page: 100,
+			}),
+		]);
 
 		reviews.forEach((review) => {
 			const monthKey = monthNames[review.createdAt.getMonth()];
 			if (monthlyData[monthKey]) {
 				monthlyData[monthKey].reviews += 1;
 			}
-		});
-
-		const { data: prs } = await octokit.rest.search.issuesAndPullRequests({
-			q: `author:${user.login} type:pr created:>${
-				sixMonthsAgo.toISOString().split("T")[0]
-			}`,
-			per_page: 100,
 		});
 
 		prs.items.forEach((pr: any) => {
