@@ -16,6 +16,15 @@ import { Octokit } from "octokit";
 import { headers } from "next/headers";
 import { inngest } from "@/inngest/client";
 
+/**
+ * Fetches aggregated dashboard metrics (commits, pull requests, reviews, repositories) for the authenticated user.
+ *
+ * @returns An object containing:
+ * - `totalCommits` — total contributions (commits) from the user's GitHub contribution calendar.
+ * - `totalPrs` — total number of pull requests authored by the user.
+ * - `totalReviews` — total number of reviews in the local database for repositories owned by the user.
+ * - `totalRepos` — total number of repositories owned by the user in the local database.
+ */
 export async function getDashboardStats() {
 	try {
 		const session = await auth.api.getSession({
@@ -72,6 +81,14 @@ export async function getDashboardStats() {
 	}
 }
 
+/**
+ * Produces an array of monthly activity summaries for the last six months.
+ *
+ * Aggregates commit counts from the user's GitHub contribution calendar and counts PRs and review events in the local database, grouped by month.
+ *
+ * @returns An array of objects for each of the last six months in chronological order with properties: `name` (month abbreviation), `commits` (number), `prs` (number), and `reviews` (number).
+ * @throws Error if the user session is missing ("Unauthorized").
+ */
 export async function getMonthlyActivity() {
 	try {
 		const session = await auth.api.getSession({
