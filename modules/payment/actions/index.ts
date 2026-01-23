@@ -37,6 +37,11 @@ export interface SubscriptionData {
 	} | null;
 }
 
+/**
+ * Retrieves the current user's subscription data and usage limits.
+ *
+ * @returns An object containing user details and limit information.
+ */
 export async function getSubscriptionData(): Promise<SubscriptionData> {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -70,6 +75,13 @@ export async function getSubscriptionData(): Promise<SubscriptionData> {
 	};
 }
 
+/**
+ * Syncs the user's subscription status with Polar.sh.
+ * Checks for active or cancelled subscriptions and updates the local database.
+ *
+ * @throws Error if user is not authenticated.
+ * @returns Object indicating success status and the new subscription status.
+ */
 export async function syncSubscriptionStatus() {
 	const session = await auth.api.getSession({
 		headers: await headers(),

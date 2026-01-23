@@ -32,6 +32,11 @@ const TIER_LIMITS = {
 	},
 } as const;
 
+/**
+ * Gets the user's current subscription tier.
+ * @param userId - User ID.
+ * @returns 'FREE' or 'PRO'.
+ */
 export async function getUserTier(userId: string): Promise<SubscriptionTier> {
 	const user = await prisma.user.findUnique({
 		where: {
@@ -45,6 +50,11 @@ export async function getUserTier(userId: string): Promise<SubscriptionTier> {
 	return (user?.subscriptionTier as SubscriptionTier) || "FREE";
 }
 
+/**
+ * Retrieves the user's usage record. Creates one if it doesn't exist.
+ * @param userId - User ID.
+ * @returns UserUsage record.
+ */
 async function getUserUsage(userId: string) {
 	let usage = await prisma.userUsage.findUnique({
 		where: {
@@ -65,6 +75,11 @@ async function getUserUsage(userId: string) {
 	return usage;
 }
 
+/**
+ * Checks if the user can connect a new repository based on their tier limits.
+ * @param userId - User ID.
+ * @returns True if allowed, false otherwise.
+ */
 export async function canConnectRepository(userId: string) {
 	const tier = await getUserTier(userId);
 
@@ -78,6 +93,12 @@ export async function canConnectRepository(userId: string) {
 	return usage.repositoryCount < limit;
 }
 
+/**
+ * Checks if the user can request a review for a specific repository.
+ * @param userId - User ID.
+ * @param repositoryId - Repository ID.
+ * @returns True if allowed, false otherwise.
+ */
 export async function canCreateReview(
 	userId: string,
 	repositoryId: string
@@ -96,6 +117,10 @@ export async function canCreateReview(
 	return currentCount < limit;
 }
 
+/**
+ * Increments the repository count for a user.
+ * @param userId - User ID.
+ */
 export async function incrementRepositoryCount(userId: string): Promise<void> {
 	await prisma.userUsage.upsert({
 		where: { userId },
@@ -112,6 +137,10 @@ export async function incrementRepositoryCount(userId: string): Promise<void> {
 	});
 }
 
+/**
+ * Decrements the repository count for a user.
+ * @param userId - User ID.
+ */
 export async function decrementRepositoryCount(userId: string): Promise<void> {
 	const usage = await getUserUsage(userId);
 
@@ -123,6 +152,11 @@ export async function decrementRepositoryCount(userId: string): Promise<void> {
 	});
 }
 
+/**
+ * Increments the review count for a specific repository.
+ * @param userId - User ID.
+ * @param repositoryId - Repository ID.
+ */
 export async function incrementReviewCount(
 	userId: string,
 	repositoryId: string
@@ -140,6 +174,11 @@ export async function incrementReviewCount(
 	});
 }
 
+/**
+ * Calculates remaining limits for the user.
+ * @param userId - User ID.
+ * @returns Object with detailed limit information.
+ */
 export async function getRemainingLimits(userId: string): Promise<UserLimits> {
 	const tier = await getUserTier(userId);
 	const usage = await getUserUsage(userId);
@@ -178,6 +217,13 @@ export async function getRemainingLimits(userId: string): Promise<UserLimits> {
 	return limits;
 }
 
+/**
+ * Updates the user's subscription tier and status.
+ * @param userId - User ID.
+ * @param tier - New tier.
+ * @param status - New status.
+ * @param polarSubscriptionId - Optional Polar subscription ID.
+ */
 export async function updateUserTier(
 	userId: string,
 	tier: SubscriptionTier,
@@ -193,6 +239,11 @@ export async function updateUserTier(
 	});
 }
 
+/**
+ * Updates the user's Polar customer ID.
+ * @param userId - User ID.
+ * @param polarCustomerId - Polar Customer ID.
+ */
 export async function updatePolarCustomerId(
 	userId: string,
 	polarCustomerId: string

@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Code Block Components
+ *
+ * Provides a syntax-highlighted code block component using Shiki.
+ * Supports light/dark modes, line numbers, and copy-to-clipboard functionality.
+ */
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CheckIcon, CopyIcon } from "lucide-react";

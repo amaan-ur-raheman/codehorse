@@ -28,6 +28,8 @@
 *   **Payments:** [Polar.sh](https://polar.sh/)
 *   **State Management:** [TanStack Query](https://tanstack.com/query/latest)
 
+> For a deeper dive into the system architecture and data flow, check out [ARCHITECTURE.md](./ARCHITECTURE.md).
+
 ## 📸 Screenshots
 
 ### Dashboard

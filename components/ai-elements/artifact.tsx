@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Artifact Components
+ *
+ * A set of components for displaying AI-generated artifacts (e.g., code snippets, previews)
+ * in a structured card-like container. Includes header, content, and action areas.
+ */
+
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,

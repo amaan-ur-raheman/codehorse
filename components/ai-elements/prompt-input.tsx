@@ -1,5 +1,17 @@
 "use client";
 
+/**
+ * Prompt Input Components
+ *
+ * A highly customizable input area for AI chat interfaces.
+ * Features:
+ * - File attachments (drag & drop, paste, file dialog)
+ * - Voice input (Speech-to-Text)
+ * - Provider-based state management (optional)
+ * - Auto-resizing textarea
+ * - Custom toolbars and actions
+ */
+
 import { Button } from "@/components/ui/button";
 import {
   Command,
