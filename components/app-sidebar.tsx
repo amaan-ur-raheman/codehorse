@@ -35,6 +35,15 @@ import Link from "next/link";
 import Logout from "@/modules/auth/components/logout";
 import { useSession } from "@/lib/auth-client";
 
+/**
+ * AppSidebar Component
+ *
+ * The main sidebar navigation for the dashboard.
+ * - Handles theme toggling (Light/Dark).
+ * - Displays user profile information (Avatar, Name, Email).
+ * - Provides navigation links to Dashboard, Repository, Reviews, Subscriptions, and Settings.
+ * - Handles user logout.
+ */
 export const AppSidebar = () => {
 	const { theme, setTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);

@@ -7,6 +7,14 @@ export const metadata: Metadata = {
 	description: "Automate your code reviews with AI. Connect your GitHub repositories and get instant, intelligent code review feedback on every pull request.",
 };
 
+/**
+ * Root Page (Home)
+ *
+ * The entry point of the application.
+ * - Checks for authentication using `requireAuth`.
+ * - If authenticated, redirects the user to the `/dashboard`.
+ * - If not authenticated, `requireAuth` will handle the redirection to the sign-in page.
+ */
 export default async function Home() {
 	await requireAuth();
 

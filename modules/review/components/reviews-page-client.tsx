@@ -15,6 +15,11 @@ import { formatDistanceToNow } from "date-fns";
 
 import { getReviews } from "@/modules/review/actions";
 
+/**
+ * Client-side component for displaying the user's review history.
+ * Fetches reviews using TanStack Query and renders them in a list of cards.
+ * Displays review status (Completed, Failed, Pending), PR details, and a preview of the review content.
+ */
 export default function ReviewsPageClient() {
 	const { data: reviews, isLoading } = useQuery({
 		queryKey: ["reviews"],

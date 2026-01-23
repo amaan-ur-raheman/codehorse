@@ -39,6 +39,16 @@ export const metadata: Metadata = {
 	},
 };
 
+/**
+ * Root Layout Component
+ *
+ * The top-level layout for the entire application.
+ * - Configures global fonts (Geist Sans, Geist Mono).
+ * - Sets up global providers:
+ *   - `QueryProvider`: For TanStack Query (server state management).
+ *   - `ThemeProvider`: For Next-themes (light/dark mode).
+ * - Includes `Toaster` for global notifications.
+ */
 export default function RootLayout({
 	children,
 }: Readonly<{
