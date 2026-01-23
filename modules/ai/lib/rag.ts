@@ -3,6 +3,12 @@ import { pineconeIndex } from "@/lib/pinecone";
 import { embed } from "ai";
 import { google } from "@ai-sdk/google";
 
+/**
+ * Generates vector embeddings for a given text string using Google's text-embedding-004 model.
+ *
+ * @param text - The input text to embed.
+ * @returns A promise that resolves to the embedding vector (array of numbers).
+ */
 export async function generateEmbedding(text: string) {
 	const { embedding } = await embed({
 		model: google.textEmbeddingModel("text-embedding-004"),
@@ -12,6 +18,18 @@ export async function generateEmbedding(text: string) {
 	return embedding;
 }
 
+/**
+ * Indexes a codebase by generating embeddings for each file and storing them in Pinecone.
+ *
+ * This function:
+ * 1. Iterates through the provided files.
+ * 2. Truncates content to fit context limits (8000 chars).
+ * 3. Generates embeddings for the file content.
+ * 4. Upserts the vectors to Pinecone in batches.
+ *
+ * @param repoId - The unique identifier for the repository (e.g., "owner/repo").
+ * @param files - Array of file objects containing path and content.
+ */
 export async function indexCodebase(
 	repoId: string,
 	files: { path: string; content: string }[]
@@ -50,6 +68,14 @@ export async function indexCodebase(
 	console.log("Indexing completed");
 }
 
+/**
+ * Retrieves relevant context from the vector database for a given query.
+ *
+ * @param query - The search query (e.g., PR title + description).
+ * @param repoId - The repository ID to filter results by.
+ * @param topK - The number of results to retrieve (default: 5).
+ * @returns An array of matching code snippets (strings).
+ */
 export async function retrieveContext(
 	query: string,
 	repoId: string,

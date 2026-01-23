@@ -1,3 +1,10 @@
+/**
+ * Canvas Component
+ *
+ * A wrapper around ReactFlow to provide an infinite canvas environment for
+ * AI-generated diagrams and visual nodes.
+ */
+
 import { Background, ReactFlow, type ReactFlowProps } from "@xyflow/react";
 import type { ReactNode } from "react";
 import "@xyflow/react/dist/style.css";

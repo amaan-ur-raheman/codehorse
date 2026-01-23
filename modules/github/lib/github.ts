@@ -4,7 +4,12 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 
-// Getting the github access token
+/**
+ * Retrieves the GitHub access token for the currently authenticated user.
+ *
+ * @throws Error if the user is not authenticated or hasn't connected GitHub.
+ * @returns The GitHub access token string.
+ */
 export const getGithubAccessToken = async () => {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -28,7 +33,13 @@ export const getGithubAccessToken = async () => {
 	return account.accessToken;
 };
 
-// Getting the user contributions on github
+/**
+ * Fetches user contribution data from GitHub GraphQL API.
+ *
+ * @param token - GitHub access token.
+ * @param username - GitHub username.
+ * @returns The contribution calendar data.
+ */
 export async function fetchUserContribution(token: string, username: string) {
 	const octokit = new Octokit({ auth: token });
 
@@ -87,6 +98,13 @@ export async function fetchUserContribution(token: string, username: string) {
 	}
 }
 
+/**
+ * Lists repositories for the authenticated user.
+ *
+ * @param page - Page number (default: 1).
+ * @param perPage - Repositories per page (default: 10).
+ * @returns List of repositories.
+ */
 export const getRepositories = async (
 	page: number = 1,
 	perPage: number = 10
@@ -105,6 +123,14 @@ export const getRepositories = async (
 	return data;
 };
 
+/**
+ * Creates a webhook on a GitHub repository to listen for pull request events.
+ * If the webhook already exists, it returns the existing one.
+ *
+ * @param owner - Repository owner.
+ * @param repo - Repository name.
+ * @returns The created or existing webhook data.
+ */
 export const createWebhook = async (owner: string, repo: string) => {
 	const token = await getGithubAccessToken();
 	const octokit = new Octokit({ auth: token });
@@ -136,6 +162,13 @@ export const createWebhook = async (owner: string, repo: string) => {
 	return data;
 };
 
+/**
+ * Deletes the Code Horse webhook from a GitHub repository.
+ *
+ * @param owner - Repository owner.
+ * @param repo - Repository name.
+ * @returns True if successful or webhook didn't exist, false otherwise.
+ */
 export const deleteWebhook = async (owner: string, repo: string) => {
 	const token = await getGithubAccessToken();
 	const octokit = new Octokit({ auth: token });
@@ -168,6 +201,15 @@ export const deleteWebhook = async (owner: string, repo: string) => {
 	}
 };
 
+/**
+ * Recursively fetches contents of all files in a repository.
+ *
+ * @param token - GitHub access token.
+ * @param owner - Repository owner.
+ * @param repo - Repository name.
+ * @param path - Current path to fetch (default: root).
+ * @returns Array of file objects with path and decoded content.
+ */
 export async function getRepoFileContents(
 	token: string,
 	owner: string,
@@ -248,6 +290,15 @@ export async function getRepoFileContents(
 	return files;
 }
 
+/**
+ * Fetches the diff, title, and description of a pull request.
+ *
+ * @param token - GitHub access token.
+ * @param owner - Repository owner.
+ * @param repo - Repository name.
+ * @param prNumber - Pull request number.
+ * @returns Object containing diff string, title, and description.
+ */
 export async function getPullRequestDiff(
 	token: string,
 	owner: string,
@@ -278,6 +329,15 @@ export async function getPullRequestDiff(
 	};
 }
 
+/**
+ * Posts a review comment on a pull request.
+ *
+ * @param token - GitHub access token.
+ * @param owner - Repository owner.
+ * @param repo - Repository name.
+ * @param prNumber - Pull request number.
+ * @param review - The markdown content of the review.
+ */
 export async function postReviewComment(
 	token: string,
 	owner: string,

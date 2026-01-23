@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * Message Components
+ *
+ * A comprehensive set of components for rendering chat messages.
+ * Includes support for user/assistant roles, attachments, branching (multiple responses),
+ * tool invocations, and markdown rendering via Streamdown.
+ */
+
 import { Button } from "@/components/ui/button";
 import {
   ButtonGroup,

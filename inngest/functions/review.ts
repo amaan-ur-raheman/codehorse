@@ -9,6 +9,18 @@ import prisma from "@/lib/db";
 import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
 
+/**
+ * Inngest function to generate an AI code review for a Pull Request.
+ *
+ * Triggered by: "pr.review.requested" event.
+ *
+ * Workflow:
+ * 1. **fetch-pr-data**: Retreives the PR diff, title, and description from GitHub.
+ * 2. **retrieve-context**: Uses RAG to fetch relevant code snippets from the vector DB based on PR content.
+ * 3. **generate-ai-review**: Sends the diff and context to Google Gemini to generate the review markdown.
+ * 4. **post-comment**: Posts the generated review as a comment on the GitHub PR.
+ * 5. **save-review**: Saves the review details to the database.
+ */
 export const generateReview = inngest.createFunction(
 	{ id: "generate-review", concurrency: 5 },
 	{ event: "pr.review.requested" },
@@ -91,7 +103,7 @@ Format your response in markdown.`;
 		});
 
 		await step.run("post-comment", async () => {
-			await postReviewComment(token, owner, repo, prNumber, review);
+			await postReviewComment(token as string, owner, repo, prNumber, review as string);
 		});
 
 		await step.run("save-review", async () => {
@@ -109,7 +121,7 @@ Format your response in markdown.`;
 						prNumber,
 						prTitle: title,
 						prUrl: `https://github.com/${owner}/${repo}/pull/${prNumber}`,
-						review,
+						review: review as string,
 						status: "completed",
 					},
 				});

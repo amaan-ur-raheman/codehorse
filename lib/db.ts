@@ -1,3 +1,13 @@
+/**
+ * Prisma Client Instance
+ *
+ * This file configures and exports a singleton instance of the Prisma Client.
+ * It uses the `@prisma/adapter-pg` driver for PostgreSQL serverless environments (if applicable).
+ *
+ * In development, the instance is attached to `globalThis` to prevent multiple connections
+ * during hot-reloads.
+ */
+
 import { PrismaClient } from "./generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
