@@ -15,7 +15,7 @@ import { google } from "@ai-sdk/google";
  * Triggered by: "pr.review.requested" event.
  *
  * Workflow:
- * 1. **fetch-pr-data**: Retreives the PR diff, title, and description from GitHub.
+ * 1. **fetch-pr-data**: Retrieves the PR diff, title, and description from GitHub.
  * 2. **retrieve-context**: Uses RAG to fetch relevant code snippets from the vector DB based on PR content.
  * 3. **generate-ai-review**: Sends the diff and context to Google Gemini to generate the review markdown.
  * 4. **post-comment**: Posts the generated review as a comment on the GitHub PR.
