@@ -2,6 +2,7 @@ import { pineconeIndex } from "@/lib/pinecone";
 
 import { embed } from "ai";
 import { google } from "@ai-sdk/google";
+import pLimit from "p-limit";
 
 /**
  * Generates vector embeddings for a given text string using Google's text-embedding-004 model.
@@ -44,27 +45,33 @@ export async function indexCodebase(
 	repoId: string,
 	files: { path: string; content: string }[]
 ) {
-	const vectors = [];
+	const limit = pLimit(10);
+	const vectors = (
+		await Promise.all(
+			files.map((file) =>
+				limit(async () => {
+					const content = `File: ${file.path}\n\n${file.content}`;
+					const truncatedContent = content.slice(0, 8000);
 
-	for (const file of files) {
-		const content = `File: ${file.path}\n\n${file.content}`;
-		const truncatedContent = content.slice(0, 8000);
-
-		try {
-			const embedding = await generateEmbedding(truncatedContent);
-			vectors.push({
-				id: `${repoId}-${file.path.replace(/\//g, "_")}`,
-				values: embedding,
-				metadata: {
-					repoId,
-					filePath: file.path,
-					content: truncatedContent,
-				},
-			});
-		} catch (error) {
-			console.error(`Failed to embed ${file.path}:`, error);
-		}
-	}
+					try {
+						const embedding = await generateEmbedding(truncatedContent);
+						return {
+							id: `${repoId}-${file.path.replace(/\//g, "_")}`,
+							values: embedding,
+							metadata: {
+								repoId,
+								filePath: file.path,
+								content: truncatedContent,
+							},
+						};
+					} catch (error) {
+						console.error(`Failed to embed ${file.path}:`, error);
+						return null;
+					}
+				})
+			)
+		)
+	).filter((v) => v !== null);
 
 	if (vectors.length > 0) {
 		const batchSize = 100;
