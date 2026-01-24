@@ -4,6 +4,8 @@ import { embed } from "ai";
 import { google } from "@ai-sdk/google";
 import pLimit from "p-limit";
 
+const MAX_EMBEDDING_CONTENT_LENGTH = 8000;
+
 /**
  * Generates vector embeddings for a given text string using Google's text-embedding-004 model.
  *
@@ -35,27 +37,42 @@ export async function generateEmbedding(text: string) {
  *
  * @param repoId - The unique identifier for the repository (e.g., "owner/repo").
  * @param files - Array of file objects containing path and content.
+ * @param concurrencyLimit - Maximum number of concurrent embedding requests (default: 10).
  */
 /**
  * Indexes codebase files into Pinecone vector database for RAG
  * @param repoId - Repository identifier
  * @param files - Array of file objects with path and content
+ * @param concurrencyLimit - Max concurrent embedding requests
  */
+type Vector = {
+	id: string;
+	values: number[];
+	metadata: {
+		repoId: string;
+		filePath: string;
+		content: string;
+	};
+};
+
 export async function indexCodebase(
 	repoId: string,
-	files: { path: string; content: string }[]
+	files: { path: string; content: string }[],
+	concurrencyLimit: number = 10
 ) {
-	const limit = pLimit(10);
-	const vectors = (
-		await Promise.all(
-			files.map((file) =>
-				limit(async () => {
-					const content = `File: ${file.path}\n\n${file.content}`;
-					const truncatedContent = content.slice(0, 8000);
+	const limit = pLimit(concurrencyLimit);
 
-					try {
-						const embedding = await generateEmbedding(truncatedContent);
-						return {
+	const results = await Promise.all(
+		files.map((file) =>
+			limit(async () => {
+				const content = `File: ${file.path}\n\n${file.content}`;
+				const truncatedContent = content.slice(0, MAX_EMBEDDING_CONTENT_LENGTH);
+
+				try {
+					const embedding = await generateEmbedding(truncatedContent);
+					return {
+						status: "success" as const,
+						data: {
 							id: `${repoId}-${file.path.replace(/\//g, "_")}`,
 							values: embedding,
 							metadata: {
@@ -63,15 +80,26 @@ export async function indexCodebase(
 								filePath: file.path,
 								content: truncatedContent,
 							},
-						};
-					} catch (error) {
-						console.error(`Failed to embed ${file.path}:`, error);
-						return null;
-					}
-				})
-			)
+						} as Vector,
+					};
+				} catch (error) {
+					console.error(`Failed to embed ${file.path}:`, error);
+					return { status: "error" as const, error, filePath: file.path };
+				}
+			})
 		)
-	).filter((v) => v !== null);
+	);
+
+	const vectors = results
+		.filter((r) => r.status === "success")
+		.map((r) => (r as { status: "success"; data: Vector }).data);
+
+	const failedFiles = results
+		.filter((r) => r.status === "error")
+		.map(
+			(r) =>
+				r as { status: "error"; filePath: string; error: Error | unknown }
+		);
 
 	if (vectors.length > 0) {
 		const batchSize = 100;
@@ -82,7 +110,13 @@ export async function indexCodebase(
 		}
 	}
 
-	console.log("Indexing completed");
+	console.log(`Indexing completed. Success: ${vectors.length}, Failed: ${failedFiles.length}`);
+
+	return {
+		successCount: vectors.length,
+		failedCount: failedFiles.length,
+		failedFiles,
+	};
 }
 
 /**
