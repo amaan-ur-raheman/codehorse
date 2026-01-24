@@ -4,6 +4,7 @@ import { embed } from "ai";
 import { google } from "@ai-sdk/google";
 import pLimit from "p-limit";
 
+// This is a character limit, aligned with Google's text-embedding-004 model maximum input length, typically around 8192 characters for token-based models.
 const MAX_EMBEDDING_CONTENT_LENGTH = 8000;
 
 /**
