@@ -43,7 +43,8 @@ export async function generateEmbedding(text: string) {
  * Indexes codebase files into Pinecone vector database for RAG
  * @param repoId - Repository identifier
  * @param files - Array of file objects with path and content
- * @param concurrencyLimit - Max concurrent embedding requests
+ * @param concurrencyLimit - Max concurrent embedding requests (defaults to env var EMBEDDING_CONCURRENCY_LIMIT or 10)
+ * @returns Object containing processing stats: successCount, failedCount, and failedFiles
  */
 type Vector = {
 	id: string;
@@ -58,7 +59,9 @@ type Vector = {
 export async function indexCodebase(
 	repoId: string,
 	files: { path: string; content: string }[],
-	concurrencyLimit: number = 10
+	concurrencyLimit: number = process.env.EMBEDDING_CONCURRENCY_LIMIT
+		? parseInt(process.env.EMBEDDING_CONCURRENCY_LIMIT, 10)
+		: 10
 ) {
 	const limit = pLimit(concurrencyLimit);
 
@@ -84,7 +87,11 @@ export async function indexCodebase(
 					};
 				} catch (error) {
 					console.error(`Failed to embed ${file.path}:`, error);
-					return { status: "error" as const, error, filePath: file.path };
+					return {
+						status: "error" as const,
+						filePath: file.path,
+						error: error instanceof Error ? error.message : String(error),
+					};
 				}
 			})
 		)
@@ -96,10 +103,7 @@ export async function indexCodebase(
 
 	const failedFiles = results
 		.filter((r) => r.status === "error")
-		.map(
-			(r) =>
-				r as { status: "error"; filePath: string; error: Error | unknown }
-		);
+		.map((r) => r as { status: "error"; filePath: string; error: string });
 
 	if (vectors.length > 0) {
 		const batchSize = 100;
