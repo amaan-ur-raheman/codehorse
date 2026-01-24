@@ -1,7 +1,23 @@
+/**
+ * GitHub webhook endpoint for handling repository events
+ * 
+ * Processes incoming webhooks from GitHub repositories and triggers
+ * appropriate actions based on the event type:
+ * 
+ * - pull_request events: Initiates AI code review generation
+ * - ping events: Responds with pong for webhook verification
+ * 
+ * @route POST /api/webhooks/github
+ */
 import { reviewPullRequest } from "@/modules/ai/actions";
 
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Handles GitHub webhook POST requests
+ * @param request - Next.js request object containing webhook payload
+ * @returns JSON response indicating success or error
+ */
 export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json();

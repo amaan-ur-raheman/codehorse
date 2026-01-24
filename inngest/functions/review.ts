@@ -1,3 +1,16 @@
+/**
+ * Inngest background job functions for Code Horse
+ * 
+ * This module contains serverless functions that handle:
+ * - AI code review generation
+ * - Repository indexing for RAG
+ * - Webhook processing
+ * 
+ * All functions are executed asynchronously to avoid blocking the main application
+ * and provide reliable processing with automatic retries.
+ * 
+ * @module inngest/functions
+ */
 import { inngest } from "../client";
 import {
 	getPullRequestDiff,

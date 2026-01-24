@@ -37,6 +37,11 @@ const TIER_LIMITS = {
  * @param userId - User ID.
  * @returns 'FREE' or 'PRO'.
  */
+/**
+ * Retrieves user's current subscription tier
+ * @param userId - User identifier
+ * @returns Promise resolving to subscription tier (FREE or PRO)
+ */
 export async function getUserTier(userId: string): Promise<SubscriptionTier> {
 	const user = await prisma.user.findUnique({
 		where: {
@@ -80,6 +85,11 @@ async function getUserUsage(userId: string) {
  * @param userId - User ID.
  * @returns True if allowed, false otherwise.
  */
+/**
+ * Checks if user can connect a new repository based on subscription limits
+ * @param userId - User identifier
+ * @returns Promise resolving to boolean indicating if repository can be connected
+ */
 export async function canConnectRepository(userId: string) {
 	const tier = await getUserTier(userId);
 
@@ -98,6 +108,12 @@ export async function canConnectRepository(userId: string) {
  * @param userId - User ID.
  * @param repositoryId - Repository ID.
  * @returns True if allowed, false otherwise.
+ */
+/**
+ * Checks if user can create a review based on subscription tier and usage limits
+ * @param userId - User identifier
+ * @param repositoryId - Repository identifier
+ * @returns Promise resolving to boolean indicating if review can be created
  */
 export async function canCreateReview(
 	userId: string,

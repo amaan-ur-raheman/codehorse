@@ -9,6 +9,11 @@ import { google } from "@ai-sdk/google";
  * @param text - The input text to embed.
  * @returns A promise that resolves to the embedding vector (array of numbers).
  */
+/**
+ * Generates text embeddings using Google's text-embedding-004 model
+ * @param text - Text content to embed
+ * @returns Promise resolving to embedding vector
+ */
 export async function generateEmbedding(text: string) {
 	const { embedding } = await embed({
 		model: google.textEmbeddingModel("text-embedding-004"),
@@ -29,6 +34,11 @@ export async function generateEmbedding(text: string) {
  *
  * @param repoId - The unique identifier for the repository (e.g., "owner/repo").
  * @param files - Array of file objects containing path and content.
+ */
+/**
+ * Indexes codebase files into Pinecone vector database for RAG
+ * @param repoId - Repository identifier
+ * @param files - Array of file objects with path and content
  */
 export async function indexCodebase(
 	repoId: string,
@@ -75,6 +85,13 @@ export async function indexCodebase(
  * @param repoId - The repository ID to filter results by.
  * @param topK - The number of results to retrieve (default: 5).
  * @returns An array of matching code snippets (strings).
+ */
+/**
+ * Retrieves relevant code context from vector database using semantic search
+ * @param query - Search query text
+ * @param repoId - Repository identifier to filter results
+ * @param topK - Number of top results to return (default: 5)
+ * @returns Promise resolving to array of relevant code snippets
  */
 export async function retrieveContext(
 	query: string,

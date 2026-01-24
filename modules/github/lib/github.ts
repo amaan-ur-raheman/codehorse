@@ -40,6 +40,12 @@ export const getGithubAccessToken = async () => {
  * @param username - GitHub username.
  * @returns The contribution calendar data.
  */
+/**
+ * Fetches GitHub user contribution data using GraphQL API
+ * @param token - GitHub access token
+ * @param username - GitHub username
+ * @returns Promise resolving to contribution calendar data
+ */
 export async function fetchUserContribution(token: string, username: string) {
 	const octokit = new Octokit({ auth: token });
 
@@ -210,6 +216,14 @@ export const deleteWebhook = async (owner: string, repo: string) => {
  * @param path - Current path to fetch (default: root).
  * @returns Array of file objects with path and decoded content.
  */
+/**
+ * Recursively fetches all file contents from a GitHub repository
+ * @param token - GitHub access token
+ * @param owner - Repository owner username
+ * @param repo - Repository name
+ * @param path - Directory path to start from (default: root)
+ * @returns Promise resolving to array of file objects with path and content
+ */
 export async function getRepoFileContents(
 	token: string,
 	owner: string,
@@ -299,6 +313,14 @@ export async function getRepoFileContents(
  * @param prNumber - Pull request number.
  * @returns Object containing diff string, title, and description.
  */
+/**
+ * Fetches pull request diff and metadata from GitHub
+ * @param token - GitHub access token
+ * @param owner - Repository owner username
+ * @param repo - Repository name
+ * @param prNumber - Pull request number
+ * @returns Promise resolving to PR diff, title, and description
+ */
 export async function getPullRequestDiff(
 	token: string,
 	owner: string,
@@ -337,6 +359,14 @@ export async function getPullRequestDiff(
  * @param repo - Repository name.
  * @param prNumber - Pull request number.
  * @param review - The markdown content of the review.
+ */
+/**
+ * Posts an AI-generated code review comment to a GitHub pull request
+ * @param token - GitHub access token
+ * @param owner - Repository owner username
+ * @param repo - Repository name
+ * @param prNumber - Pull request number
+ * @param review - AI-generated review content
  */
 export async function postReviewComment(
 	token: string,

@@ -1,3 +1,15 @@
+/**
+ * Main application sidebar component providing navigation and user controls
+ * 
+ * Features:
+ * - Navigation menu with active state indicators
+ * - User profile display with avatar and subscription tier
+ * - Theme toggle (light/dark mode)
+ * - Logout functionality
+ * - Responsive design with collapsible sidebar
+ * 
+ * @component
+ */
 "use client";
 
 import {
