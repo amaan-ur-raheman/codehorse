@@ -111,7 +111,11 @@ export async function indexCodebase(
 
 		for (let i = 0; i < vectors.length; i += batchSize) {
 			const batch = vectors.slice(i, i + batchSize);
-			await pineconeIndex.upsert(batch);
+			try {
+				await pineconeIndex.upsert(batch);
+			} catch (error) {
+				console.error(`Failed to upsert batch ${i / batchSize}:`, error);
+			}
 		}
 	}
 
