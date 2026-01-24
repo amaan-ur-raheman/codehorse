@@ -2,6 +2,11 @@ import { pineconeIndex } from "@/lib/pinecone";
 
 import { embed } from "ai";
 import { google } from "@ai-sdk/google";
+import pLimit from "p-limit";
+
+// This is a character limit chosen to be well within the input limits of Google's text-embedding-004 model (3072 tokens).
+const MAX_EMBEDDING_CONTENT_LENGTH = 8000;
+const DEFAULT_CONCURRENCY_LIMIT = 10;
 
 /**
  * Generates vector embeddings for a given text string using Google's text-embedding-004 model.
@@ -34,48 +39,114 @@ export async function generateEmbedding(text: string) {
  *
  * @param repoId - The unique identifier for the repository (e.g., "owner/repo").
  * @param files - Array of file objects containing path and content.
+ * @param concurrencyLimit - Maximum number of concurrent embedding requests (default: 10).
  */
 /**
  * Indexes codebase files into Pinecone vector database for RAG
  * @param repoId - Repository identifier
  * @param files - Array of file objects with path and content
+ * @param concurrencyLimitParam - Max concurrent embedding requests (defaults to env var EMBEDDING_CONCURRENCY_LIMIT or 10)
+ * @returns Object containing processing stats: successCount, failedCount, failedUpsertCount, and failedFiles
  */
+type Vector = {
+	id: string;
+	values: number[];
+	metadata: {
+		repoId: string;
+		filePath: string;
+		content: string;
+	};
+};
+
+type SuccessResult = { status: "success"; data: Vector };
+type ErrorResult = { status: "error"; filePath: string; error: string };
+type EmbeddingResult = SuccessResult | ErrorResult;
+
 export async function indexCodebase(
 	repoId: string,
-	files: { path: string; content: string }[]
+	files: { path: string; content: string }[],
+	concurrencyLimitParam?: number
 ) {
-	const vectors = [];
+	const envLimit = process.env.EMBEDDING_CONCURRENCY_LIMIT
+		? parseInt(process.env.EMBEDDING_CONCURRENCY_LIMIT, 10)
+		: undefined;
 
-	for (const file of files) {
-		const content = `File: ${file.path}\n\n${file.content}`;
-		const truncatedContent = content.slice(0, 8000);
+	const concurrencyLimit =
+		concurrencyLimitParam ??
+		(envLimit && !isNaN(envLimit) ? envLimit : DEFAULT_CONCURRENCY_LIMIT);
 
-		try {
-			const embedding = await generateEmbedding(truncatedContent);
-			vectors.push({
-				id: `${repoId}-${file.path.replace(/\//g, "_")}`,
-				values: embedding,
-				metadata: {
-					repoId,
-					filePath: file.path,
-					content: truncatedContent,
-				},
-			});
-		} catch (error) {
-			console.error(`Failed to embed ${file.path}:`, error);
-		}
-	}
+	const limit = pLimit(concurrencyLimit);
+
+	const results: EmbeddingResult[] = await Promise.all(
+		files.map((file) =>
+			limit(async (): Promise<EmbeddingResult> => {
+				const content = `File: ${file.path}\n\n${file.content}`;
+				const truncatedContent = content.slice(0, MAX_EMBEDDING_CONTENT_LENGTH);
+
+				if (content.length > MAX_EMBEDDING_CONTENT_LENGTH) {
+					console.warn(
+						`Content for ${file.path} was truncated from ${content.length} to ${MAX_EMBEDDING_CONTENT_LENGTH} characters.`
+					);
+				}
+
+				try {
+					const embedding = await generateEmbedding(truncatedContent);
+					return {
+						status: "success",
+						data: {
+							id: `${repoId}-${file.path.replace(/\//g, "_")}`,
+							values: embedding,
+							metadata: {
+								repoId,
+								filePath: file.path,
+								content: truncatedContent,
+							},
+						},
+					};
+				} catch (error) {
+					console.error(`Failed to embed ${file.path}:`, error);
+					return {
+						status: "error",
+						filePath: file.path,
+						error: error instanceof Error ? error.message : String(error),
+					};
+				}
+			})
+		)
+	);
+
+	const vectors = results
+		.filter((r): r is SuccessResult => r.status === "success")
+		.map((r) => r.data);
+
+	const failedFiles = results
+		.filter((r): r is ErrorResult => r.status === "error");
+
+	let failedUpsertCount = 0;
 
 	if (vectors.length > 0) {
 		const batchSize = 100;
 
 		for (let i = 0; i < vectors.length; i += batchSize) {
 			const batch = vectors.slice(i, i + batchSize);
-			await pineconeIndex.upsert(batch);
+			try {
+				await pineconeIndex.upsert(batch);
+			} catch (error) {
+				failedUpsertCount += batch.length;
+				const batchIds = batch.map(v => v.id).join(", ");
+				console.error(`Failed to upsert batch ${i / batchSize} (IDs: ${batchIds}):`, error);
+			}
 		}
 	}
 
-	console.log("Indexing completed");
+	console.log(`Indexing completed. Success: ${vectors.length}, Embedding Failed: ${failedFiles.length}, Upsert Failed: ${failedUpsertCount}`);
+
+	return {
+		successCount: vectors.length - failedUpsertCount,
+		failedCount: failedFiles.length,
+		failedUpsertCount,
+		failedFiles,
+	};
 }
 
 /**

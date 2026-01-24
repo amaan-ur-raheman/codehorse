@@ -97,6 +97,7 @@ Manage your plan and usage limits.
 
     # AI (Google Gemini)
     GOOGLE_GENERATIVE_AI_API_KEY="your_google_api_key"
+    EMBEDDING_CONCURRENCY_LIMIT="10" # Optional: Limit concurrent embedding generation
 
     # Vector DB (Pinecone)
     PINECONE_API_KEY="your_pinecone_api_key"

@@ -28,9 +28,9 @@ export const indexRepo = inngest.createFunction(
 			);
 
 			// Index immediately and return only metadata
-			await indexCodebase(`${owner}/${repo}`, files);
+			const stats = await indexCodebase(`${owner}/${repo}`, files);
 
-			return files.length;
+			return stats.successCount;
 		});
 
 		return { success: true, indexedFiles: fileCount };
