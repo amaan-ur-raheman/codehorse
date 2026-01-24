@@ -6,6 +6,7 @@ import pLimit from "p-limit";
 
 // This is a character limit chosen to be well within the input limits of Google's text-embedding-004 model (3072 tokens).
 const MAX_EMBEDDING_CONTENT_LENGTH = 8000;
+const DEFAULT_CONCURRENCY_LIMIT = 10;
 
 /**
  * Generates vector embeddings for a given text string using Google's text-embedding-004 model.
@@ -70,7 +71,9 @@ export async function indexCodebase(
 		? parseInt(process.env.EMBEDDING_CONCURRENCY_LIMIT, 10)
 		: undefined;
 
-	const concurrencyLimit = concurrencyLimitParam ?? (envLimit && !isNaN(envLimit) ? envLimit : 10);
+	const concurrencyLimit =
+		concurrencyLimitParam ??
+		(envLimit && !isNaN(envLimit) ? envLimit : DEFAULT_CONCURRENCY_LIMIT);
 
 	const limit = pLimit(concurrencyLimit);
 
@@ -79,6 +82,12 @@ export async function indexCodebase(
 			limit(async (): Promise<EmbeddingResult> => {
 				const content = `File: ${file.path}\n\n${file.content}`;
 				const truncatedContent = content.slice(0, MAX_EMBEDDING_CONTENT_LENGTH);
+
+				if (content.length > MAX_EMBEDDING_CONTENT_LENGTH) {
+					console.warn(
+						`Content for ${file.path} was truncated from ${content.length} to ${MAX_EMBEDDING_CONTENT_LENGTH} characters.`
+					);
+				}
 
 				try {
 					const embedding = await generateEmbedding(truncatedContent);
