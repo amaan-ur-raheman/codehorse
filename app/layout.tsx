@@ -1,3 +1,15 @@
+/**
+ * Root layout component for Code Horse application
+ * 
+ * Provides:
+ * - Global font configuration (Geist Sans & Mono)
+ * - Theme provider for dark/light mode
+ * - React Query provider for data fetching
+ * - Toast notifications
+ * - SEO metadata and Open Graph tags
+ * 
+ * @layout
+ */
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 

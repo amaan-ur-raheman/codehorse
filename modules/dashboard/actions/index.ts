@@ -16,6 +16,10 @@ import { Octokit } from "octokit";
 import { headers } from "next/headers";
 import { inngest } from "@/inngest/client";
 
+/**
+ * Retrieves dashboard statistics for the authenticated user
+ * @returns Promise resolving to dashboard stats object with commits, PRs, reviews, and repos
+ */
 export async function getDashboardStats() {
 	try {
 		const session = await auth.api.getSession({
@@ -231,6 +235,13 @@ export async function getContributionStats() {
 	}
 }
 
+/**
+ * Connects a GitHub repository to Code Horse for automated reviews
+ * @param owner - Repository owner username
+ * @param repo - Repository name
+ * @param githubId - GitHub repository ID
+ * @returns Promise resolving to webhook creation result
+ */
 export async function connectRepository(
 	owner: string,
 	repo: string,

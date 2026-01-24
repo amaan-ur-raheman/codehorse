@@ -1,3 +1,15 @@
+/**
+ * Reviews page client component displaying AI-generated code reviews
+ * 
+ * Features:
+ * - List of all code reviews with status indicators
+ * - Review content display with markdown formatting
+ * - Links to original pull requests
+ * - Status badges (pending, completed, failed)
+ * - Responsive card layout
+ * 
+ * @component
+ */
 "use client";
 
 import {

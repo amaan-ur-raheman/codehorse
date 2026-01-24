@@ -1,3 +1,14 @@
+/**
+ * Dashboard page client component displaying user statistics and activity
+ * 
+ * Features:
+ * - Overview cards showing commits, PRs, reviews, and repositories
+ * - Monthly activity chart with contribution data
+ * - GitHub contribution calendar integration
+ * - Real-time data fetching with React Query
+ * 
+ * @component
+ */
 "use client";
 
 import {

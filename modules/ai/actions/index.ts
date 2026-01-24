@@ -7,6 +7,13 @@ import {
 	incrementReviewCount,
 } from "@/modules/payment/lib/subscription";
 
+/**
+ * Initiates an AI-powered code review for a pull request
+ * @param owner - Repository owner username
+ * @param repo - Repository name
+ * @param prNumber - Pull request number
+ * @returns Promise with success status and message
+ */
 export async function reviewPullRequest(
 	owner: string,
 	repo: string,

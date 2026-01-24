@@ -1,3 +1,12 @@
+/**
+ * Home page component - redirects authenticated users to dashboard
+ * 
+ * This page serves as the entry point for the application.
+ * It checks authentication status and redirects users to the dashboard
+ * if they are logged in, or to the login page if not authenticated.
+ * 
+ * @page
+ */
 import { requireAuth } from "@/modules/auth/utils/auth-utils";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
