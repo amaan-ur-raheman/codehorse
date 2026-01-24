@@ -4,7 +4,7 @@ import { embed } from "ai";
 import { google } from "@ai-sdk/google";
 import pLimit from "p-limit";
 
-// This is a character limit, aligned with Google's text-embedding-004 model maximum input length, typically around 8192 characters for token-based models.
+// This is a character limit chosen to be well within the input limits of Google's text-embedding-004 model (3072 tokens).
 const MAX_EMBEDDING_CONTENT_LENGTH = 8000;
 
 /**
@@ -45,7 +45,7 @@ export async function generateEmbedding(text: string) {
  * @param repoId - Repository identifier
  * @param files - Array of file objects with path and content
  * @param concurrencyLimitParam - Max concurrent embedding requests (defaults to env var EMBEDDING_CONCURRENCY_LIMIT or 10)
- * @returns Object containing processing stats: successCount, failedCount, and failedFiles
+ * @returns Object containing processing stats: successCount, failedCount, failedUpsertCount, and failedFiles
  */
 type Vector = {
 	id: string;
