@@ -4,19 +4,13 @@ import { embed } from "ai";
 import { google } from "@ai-sdk/google";
 
 /**
- * Generates vector embeddings for a given text string using Google's text-embedding-004 model.
- *
- * @param text - The input text to embed.
- * @returns A promise that resolves to the embedding vector (array of numbers).
- */
-/**
- * Generates text embeddings using Google's text-embedding-004 model
+ * Generates text embeddings using Google's gemini-embedding-001 model
  * @param text - Text content to embed
  * @returns Promise resolving to embedding vector
  */
 export async function generateEmbedding(text: string) {
 	const { embedding } = await embed({
-		model: google.textEmbeddingModel("text-embedding-004"),
+		model: google.textEmbeddingModel("gemini-embedding-001"),
 		value: text,
 	});
 
