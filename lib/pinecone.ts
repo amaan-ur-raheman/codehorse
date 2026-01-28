@@ -18,4 +18,4 @@ export const pinecone = new Pinecone({
 });
 
 // The specific index used for Code Horse embeddings
-export const pineconeIndex = pinecone.Index("codehorse-vector-embeddings-v2");
+export const pineconeIndex = pinecone.Index("codehorse-vector-embedding-v3");

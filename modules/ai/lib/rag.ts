@@ -10,8 +10,14 @@ import { google } from "@ai-sdk/google";
  */
 export async function generateEmbedding(text: string) {
 	const { embedding } = await embed({
-		model: google.textEmbeddingModel("text-embedding-004"),
+		model: google.textEmbedding("gemini-embedding-001"),
 		value: text,
+		providerOptions: {
+			google: {
+				outputDimensionality: 3072,
+				taskType: "SEMANTIC_SIMILARITY",
+			},
+		},
 	});
 
 	return embedding;
