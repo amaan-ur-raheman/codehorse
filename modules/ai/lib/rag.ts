@@ -4,15 +4,13 @@ import { embed } from "ai";
 import { google } from "@ai-sdk/google";
 
 /**
- * Generates text embeddings using Google's gemini-embedding-001 model
+ * Generates text embeddings using Google's text-embedding-004 model
  * @param text - Text content to embed
- * @returns Promise resolving to embedding vector
+ * @returns Promise resolving to embedding vector (768 dimensions)
  */
 export async function generateEmbedding(text: string) {
 	const { embedding } = await embed({
-		model: google.textEmbeddingModel("gemini-embedding-001", {
-			outputDimensionality: 768,
-		}),
+		model: google.textEmbeddingModel("text-embedding-004"),
 		value: text,
 	});
 
@@ -38,7 +36,7 @@ export async function generateEmbedding(text: string) {
  */
 export async function indexCodebase(
 	repoId: string,
-	files: { path: string; content: string }[]
+	files: { path: string; content: string }[],
 ) {
 	const vectors = [];
 
@@ -92,7 +90,7 @@ export async function indexCodebase(
 export async function retrieveContext(
 	query: string,
 	repoId: string,
-	topK: number = 5
+	topK: number = 5,
 ) {
 	const embedding = await generateEmbedding(query);
 
