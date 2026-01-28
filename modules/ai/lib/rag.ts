@@ -10,7 +10,9 @@ import { google } from "@ai-sdk/google";
  */
 export async function generateEmbedding(text: string) {
 	const { embedding } = await embed({
-		model: google.textEmbeddingModel("gemini-embedding-001"),
+		model: google.textEmbeddingModel("gemini-embedding-001", {
+			outputDimensionality: 3072,
+		}),
 		value: text,
 	});
 
